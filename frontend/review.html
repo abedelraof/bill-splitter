@@ -8,98 +8,86 @@
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
   <link rel="stylesheet" href="/css/app.css">
 </head>
-<body class="min-h-screen bg-gray-50 pb-24" x-data="reviewPage()" x-init="init()">
+<body style="background:#0D0D1A" class="min-h-screen pb-24" x-data="reviewPage()" x-init="init()">
 
-  <!-- ═══════════════════════════════════════
-       PHASE 1 — Items one at a time
-  ═══════════════════════════════════════ -->
+  <!-- ══════════ PHASE 1 — Items ══════════ -->
   <div x-show="phase === 'items'">
 
-    <!-- Nav -->
-    <nav class="bg-white border-b border-gray-100 sticky top-0 z-20">
+    <nav class="neon-nav">
       <div class="max-w-lg mx-auto px-4 h-14 flex items-center justify-between">
-        <a href="/upload.html" class="text-gray-400 hover:text-indigo-600 transition-colors">
+        <a href="/upload.html" style="color:#A0A0C0" class="hover:text-white transition-colors">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
         </a>
-        <span class="font-semibold text-gray-800">Review Bill</span>
-        <span class="text-sm font-medium text-indigo-600" x-text="items.length > 0 ? `${currentIndex + 1} of ${items.length}` : ''"></span>
+        <span class="font-bold text-white">Review Bill</span>
+        <span class="text-sm font-bold cyan-text" x-text="items.length > 0 ? `${currentIndex+1} of ${items.length}` : ''"></span>
       </div>
-      <!-- Progress bar -->
-      <div class="h-1 bg-gray-100">
-        <div class="h-1 bg-indigo-500 transition-all duration-300"
-          :style="`width: ${items.length > 0 ? ((currentIndex + 1) / items.length * 100) : 0}%`"></div>
+      <div class="neon-progress-track">
+        <div class="neon-progress-fill" :style="`width:${items.length > 0 ? (currentIndex+1)/items.length*100 : 0}%`"></div>
       </div>
     </nav>
 
-    <!-- Item card -->
-    <div class="max-w-lg mx-auto px-4 pt-6 pb-4" x-show="items.length > 0">
+    <div class="max-w-lg mx-auto px-4 pt-6 pb-4">
+
+      <!-- Item card -->
       <template x-if="currentItem()">
-        <div class="bg-white rounded-3xl shadow-lg border border-gray-100 overflow-hidden">
+        <div class="neon-card overflow-hidden" style="border-radius:1.5rem">
 
-          <!-- Item header -->
+          <!-- Header -->
           <div class="px-6 pt-6 pb-5">
-            <div class="flex items-start justify-between gap-4 mb-1">
-              <h2 class="text-xl font-bold text-gray-900 flex-1 leading-snug" x-text="currentItem().description || 'Unnamed item'"></h2>
-              <span class="text-xl font-bold text-indigo-600 flex-shrink-0" x-text="`$${parseFloat(currentItem().amount || 0).toFixed(2)}`"></span>
+            <div class="flex items-start justify-between gap-4 mb-2">
+              <h2 class="text-xl font-black text-white flex-1 leading-snug" x-text="currentItem().description || 'Unnamed item'"></h2>
+              <span class="text-2xl font-black amount-display flex-shrink-0" x-text="`$${parseFloat(currentItem().amount||0).toFixed(2)}`"></span>
             </div>
-            <div class="flex items-center gap-2">
-              <span x-show="currentItem().is_manual" class="text-xs bg-purple-100 text-purple-600 px-2 py-0.5 rounded-full font-medium">manual</span>
-            </div>
+            <span x-show="currentItem().is_manual" class="text-xs px-2 py-0.5 rounded-full font-medium"
+              style="background:rgba(124,58,237,0.2); color:#7C3AED">manual</span>
 
-            <!-- Editable fields (collapsed by default, expand on tap) -->
+            <!-- Edit toggle -->
             <div class="mt-4 space-y-2" x-show="editingCurrent">
-              <input type="text" x-model="currentItem().description" placeholder="Description"
-                class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400">
+              <input type="text" x-model="currentItem().description" placeholder="Description" class="neon-input">
               <div class="flex items-center gap-2">
-                <span class="text-gray-400 text-sm font-medium">$</span>
-                <input type="number" x-model="currentItem().amount" min="0" step="0.01" placeholder="0.00"
-                  class="flex-1 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400">
+                <span class="muted-text font-bold">$</span>
+                <input type="number" x-model="currentItem().amount" min="0" step="0.01" class="neon-input">
               </div>
             </div>
-            <button @click="editingCurrent = !editingCurrent"
-              class="mt-2 text-xs text-indigo-400 hover:text-indigo-600 transition-colors"
-              x-text="editingCurrent ? 'Done editing' : 'Edit name or price'"></button>
+            <button @click="editingCurrent=!editingCurrent"
+              class="mt-2 text-xs transition-colors"
+              style="color:#A0A0C0"
+              x-text="editingCurrent ? 'Done editing' : '✏️ Edit name or price'"></button>
           </div>
 
           <!-- Divider -->
-          <div class="h-px bg-gray-100 mx-6"></div>
+          <div class="section-divider mx-6"></div>
 
-          <!-- Friend assignment -->
+          <!-- Friends -->
           <div class="px-6 py-5">
-            <p class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-4">Who had this?</p>
+            <p class="label-muted mb-4">Who had this?</p>
 
-            <div x-show="friends.length === 0" class="text-sm text-gray-400 text-center py-4">
-              Go to the dashboard and add friends first.
+            <div x-show="friends.length === 0" class="text-sm muted-text text-center py-3">
+              Add friends on the dashboard first.
             </div>
 
-            <!-- Friend grid -->
             <div class="grid grid-cols-3 gap-4" x-show="friends.length > 0">
               <template x-for="(f, fi) in friends" :key="f.id">
                 <button @click="toggleFriend(currentItem(), f.id)"
-                  class="flex flex-col items-center gap-1.5 py-2 rounded-2xl transition-all"
-                  :class="currentItem().friend_ids.includes(f.id) ? 'bg-indigo-50' : 'hover:bg-gray-50'">
+                  class="flex flex-col items-center gap-2 py-2 rounded-2xl transition-all"
+                  :style="currentItem().friend_ids.includes(f.id) ? 'background:rgba(124,58,237,0.1)' : ''">
 
-                  <!-- Avatar circle -->
-                  <div class="relative w-14 h-14 rounded-full flex items-center justify-center text-lg font-bold transition-all border-2"
-                    :style="currentItem().friend_ids.includes(f.id) ? `background:${friendColor(fi)}; border-color:${friendColor(fi)}; color:white` : 'background:white; border-color:#e5e7eb; color:#9ca3af'">
+                  <div class="friend-avatar"
+                    :class="currentItem().friend_ids.includes(f.id) ? 'selected' : ''"
+                    :style="currentItem().friend_ids.includes(f.id)
+                      ? `background:${friendColor(fi)}; border-color:${friendColor(fi)}; box-shadow:0 0 16px ${friendColor(fi)}66`
+                      : `border-color:#2D2D4E`">
                     <span x-text="f.name[0].toUpperCase()"></span>
-                    <!-- Checkmark overlay -->
-                    <div x-show="currentItem().friend_ids.includes(f.id)"
-                      class="absolute -bottom-0.5 -right-0.5 w-5 h-5 bg-white rounded-full flex items-center justify-center border border-gray-100">
-                      <svg class="w-3 h-3 text-indigo-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
-                    </div>
                   </div>
 
                   <span class="text-xs font-medium text-center leading-tight"
-                    :class="currentItem().friend_ids.includes(f.id) ? 'text-indigo-700' : 'text-gray-500'"
+                    :style="currentItem().friend_ids.includes(f.id) ? 'color:#7C3AED' : 'color:#A0A0C0'"
                     x-text="f.name"></span>
                 </button>
               </template>
             </div>
 
-            <!-- Skip -->
-            <button @click="skipItem()"
-              class="mt-5 w-full text-sm text-gray-400 hover:text-gray-600 py-2 transition-colors">
+            <button @click="skipItem()" class="mt-5 w-full text-sm py-2 transition-colors muted-text hover:text-white">
               Nobody — skip this item
             </button>
           </div>
@@ -107,204 +95,186 @@
       </template>
 
       <!-- Empty state -->
-      <div x-show="items.length === 0" class="text-center py-12 text-gray-400">
+      <div x-show="items.length === 0" class="text-center py-16">
         <div class="text-5xl mb-3">🧾</div>
-        <p class="font-medium">No items yet</p>
-        <p class="text-sm mt-1">Add items manually or go back to upload a receipt</p>
+        <p class="font-bold text-white">No items yet</p>
+        <p class="text-sm mt-1 muted-text">Add items manually or go back to upload</p>
       </div>
     </div>
 
-    <!-- Add manual item button -->
+    <!-- Add manual item -->
     <div class="max-w-lg mx-auto px-4 mt-2">
       <button @click="addManualItem()"
-        class="w-full border-2 border-dashed border-gray-200 hover:border-indigo-400 text-gray-400 hover:text-indigo-600 py-3.5 rounded-2xl text-sm font-medium transition-colors flex items-center justify-center gap-2">
+        class="w-full py-3.5 rounded-2xl text-sm font-medium transition-all flex items-center justify-center gap-2"
+        style="border:2px dashed #2D2D4E; color:#A0A0C0"
+        onmouseover="this.style.borderColor='#7C3AED'; this.style.color='#7C3AED'"
+        onmouseout="this.style.borderColor='#2D2D4E'; this.style.color='#A0A0C0'">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
         Add item manually
       </button>
     </div>
 
     <!-- Error -->
-    <div x-show="error" x-text="error" class="max-w-lg mx-auto mx-4 mt-3 px-4 text-red-600 text-sm bg-red-50 rounded-xl px-4 py-3"></div>
+    <div x-show="error" x-text="error" class="max-w-lg mx-auto mx-4 mt-3 px-4 text-sm rounded-xl px-4 py-3"
+      style="color:#FF006E; background:rgba(255,0,110,0.08)"></div>
 
     <!-- Bottom nav -->
-    <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 z-20">
+    <div class="fixed bottom-0 left-0 right-0 z-20" style="background:rgba(13,13,26,0.95); border-top:1px solid #2D2D4E; backdrop-filter:blur(12px)">
       <div class="max-w-lg mx-auto px-4 py-3 flex items-center justify-between gap-3">
-        <!-- Delete -->
         <button @click="removeCurrentItem()" x-show="items.length > 0"
-          class="flex items-center gap-1.5 text-sm text-red-400 hover:text-red-600 transition-colors px-2 py-2">
+          class="flex items-center gap-1.5 text-sm px-2 py-2 transition-colors"
+          style="color:#A0A0C0"
+          onmouseover="this.style.color='#FF006E'" onmouseout="this.style.color='#A0A0C0'">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
           Delete
         </button>
-
         <div class="flex-1"></div>
-
-        <!-- Previous (shown after first item) -->
         <button @click="prevItem()" x-show="currentIndex > 0"
-          class="border border-gray-200 text-gray-600 hover:bg-gray-50 font-medium px-5 py-2.5 rounded-xl transition-colors text-sm">
+          class="neon-btn neon-btn-ghost" style="width:auto; padding:0.6rem 1.25rem; font-size:0.875rem">
           ← Prev
         </button>
-
-        <!-- Next / Go to Charges -->
         <button @click="nextItem()" x-show="items.length > 0"
-          class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-7 py-2.5 rounded-xl transition-colors text-sm">
-          <span x-text="currentIndex < items.length - 1 ? 'Next →' : 'Review Charges →'"></span>
+          class="neon-btn neon-btn-primary" style="width:auto; padding:0.6rem 1.5rem; font-size:0.875rem">
+          <span x-text="currentIndex < items.length-1 ? 'Next →' : 'Review Charges →'"></span>
         </button>
-
-        <!-- Go to charges even with no items -->
-        <button @click="phase = 'charges'" x-show="items.length === 0"
-          class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-7 py-2.5 rounded-xl transition-colors text-sm">
+        <button @click="phase='charges'" x-show="items.length === 0"
+          class="neon-btn neon-btn-primary" style="width:auto; padding:0.6rem 1.5rem; font-size:0.875rem">
           Review Charges →
         </button>
       </div>
     </div>
   </div>
 
-  <!-- ═══════════════════════════════════════
-       PHASE 2 — Charges & Submit
-  ═══════════════════════════════════════ -->
+  <!-- ══════════ PHASE 2 — Charges ══════════ -->
   <div x-show="phase === 'charges'">
 
-    <!-- Nav -->
-    <nav class="bg-white border-b border-gray-100 sticky top-0 z-20">
+    <nav class="neon-nav">
       <div class="max-w-lg mx-auto px-4 h-14 flex items-center gap-3">
-        <button @click="phase = 'items'; currentIndex = Math.max(0, items.length - 1)" class="text-gray-400 hover:text-indigo-600 transition-colors">
+        <button @click="phase='items'; currentIndex=Math.max(0,items.length-1)" style="color:#A0A0C0" class="hover:text-white transition-colors">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
         </button>
-        <span class="font-semibold text-gray-800">Charges & Submit</span>
+        <span class="font-bold text-white">Charges &amp; Submit</span>
       </div>
-      <div class="h-1 bg-indigo-500"></div>
+      <div class="neon-progress-track"><div class="neon-progress-fill" style="width:100%"></div></div>
     </nav>
 
     <div class="max-w-lg mx-auto px-4 py-5 space-y-4">
 
-      <!-- Charges section -->
-      <div>
-        <p class="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3 px-1">Charges &amp; Discounts</p>
-        <div class="space-y-3">
+      <p class="label-muted px-1">Charges &amp; Discounts</p>
 
-          <!-- VAT -->
-          <div class="bg-white rounded-2xl border border-gray-100 shadow-sm px-5 py-4">
-            <div class="flex items-center justify-between mb-3">
-              <span class="font-semibold text-gray-800">VAT</span>
-              <span x-show="extras.vat" class="text-sm font-medium text-indigo-600"
-                x-text="extras.vat ? (extras.vat.type === 'percent' ? `${extras.vat.value}%` : `$${parseFloat(extras.vat.value||0).toFixed(2)}`) : ''"></span>
-            </div>
-            <div class="flex items-center gap-3">
-              <div class="flex rounded-xl border border-gray-200 overflow-hidden text-sm">
-                <button @click="ensureExtra('vat'); extras.vat.type = 'percent'"
-                  :class="extras.vat?.type === 'percent' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-500'"
-                  class="px-3 py-2 font-medium transition-colors">%</button>
-                <button @click="ensureExtra('vat'); extras.vat.type = 'fixed'"
-                  :class="extras.vat?.type === 'fixed' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-500'"
-                  class="px-3 py-2 font-medium border-l border-gray-200 transition-colors">$</button>
-              </div>
-              <input type="number" min="0" step="0.01" placeholder="0"
-                :value="extras.vat?.value ?? ''"
-                @focus="ensureExtra('vat')"
-                @input="setExtra('vat', $event.target.value)"
-                class="flex-1 border border-gray-200 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400">
-              <button @click="extras.vat = null" x-show="extras.vat" class="text-gray-300 hover:text-red-400 transition-colors">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-              </button>
-            </div>
+      <!-- VAT -->
+      <div class="neon-card p-5">
+        <div class="flex items-center justify-between mb-3">
+          <span class="font-bold text-white">VAT</span>
+          <span class="cyan-text text-sm font-bold" x-show="extras.vat"
+            x-text="extras.vat ? (extras.vat.type==='percent' ? `${extras.vat.value}%` : `$${parseFloat(extras.vat.value||0).toFixed(2)}`) : ''"></span>
+        </div>
+        <div class="flex items-center gap-3">
+          <div class="flex rounded-xl overflow-hidden text-sm" style="border:1px solid #2D2D4E">
+            <button @click="ensureExtra('vat'); extras.vat.type='percent'"
+              :style="extras.vat?.type==='percent' ? 'background:#7C3AED; color:white' : 'background:#12122A; color:#A0A0C0'"
+              class="px-3 py-2 font-bold transition-colors">%</button>
+            <button @click="ensureExtra('vat'); extras.vat.type='fixed'"
+              :style="extras.vat?.type==='fixed' ? 'background:#7C3AED; color:white' : 'background:#12122A; color:#A0A0C0'"
+              class="px-3 py-2 font-bold border-l transition-colors" style="border-color:#2D2D4E">$</button>
           </div>
-
-          <!-- Service Charge -->
-          <div class="bg-white rounded-2xl border border-gray-100 shadow-sm px-5 py-4">
-            <div class="flex items-center justify-between mb-3">
-              <span class="font-semibold text-gray-800">Service Charge</span>
-              <span x-show="extras.service_charge" class="text-sm font-medium text-indigo-600"
-                x-text="extras.service_charge ? (extras.service_charge.type === 'percent' ? `${extras.service_charge.value}%` : `$${parseFloat(extras.service_charge.value||0).toFixed(2)}`) : ''"></span>
-            </div>
-            <div class="flex items-center gap-3">
-              <div class="flex rounded-xl border border-gray-200 overflow-hidden text-sm">
-                <button @click="ensureExtra('service_charge'); extras.service_charge.type = 'percent'"
-                  :class="extras.service_charge?.type === 'percent' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-500'"
-                  class="px-3 py-2 font-medium transition-colors">%</button>
-                <button @click="ensureExtra('service_charge'); extras.service_charge.type = 'fixed'"
-                  :class="extras.service_charge?.type === 'fixed' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-500'"
-                  class="px-3 py-2 font-medium border-l border-gray-200 transition-colors">$</button>
-              </div>
-              <input type="number" min="0" step="0.01" placeholder="0"
-                :value="extras.service_charge?.value ?? ''"
-                @focus="ensureExtra('service_charge')"
-                @input="setExtra('service_charge', $event.target.value)"
-                class="flex-1 border border-gray-200 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400">
-              <button @click="extras.service_charge = null" x-show="extras.service_charge" class="text-gray-300 hover:text-red-400 transition-colors">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-              </button>
-            </div>
-          </div>
-
-          <!-- Discount -->
-          <div class="bg-white rounded-2xl border border-gray-100 shadow-sm px-5 py-4">
-            <div class="flex items-center justify-between mb-3">
-              <span class="font-semibold text-gray-800">Discount</span>
-              <span x-show="extras.discount" class="text-sm font-medium text-green-600"
-                x-text="extras.discount ? (extras.discount.type === 'percent' ? `−${extras.discount.value}%` : `−$${parseFloat(extras.discount.value||0).toFixed(2)}`) : ''"></span>
-            </div>
-            <div class="flex items-center gap-3">
-              <div class="flex rounded-xl border border-gray-200 overflow-hidden text-sm">
-                <button @click="ensureExtra('discount'); extras.discount.type = 'percent'"
-                  :class="extras.discount?.type === 'percent' ? 'bg-green-600 text-white' : 'bg-white text-gray-500'"
-                  class="px-3 py-2 font-medium transition-colors">%</button>
-                <button @click="ensureExtra('discount'); extras.discount.type = 'fixed'"
-                  :class="extras.discount?.type === 'fixed' ? 'bg-green-600 text-white' : 'bg-white text-gray-500'"
-                  class="px-3 py-2 font-medium border-l border-gray-200 transition-colors">$</button>
-              </div>
-              <input type="number" min="0" step="0.01" placeholder="0"
-                :value="extras.discount?.value ?? ''"
-                @focus="ensureExtra('discount')"
-                @input="setExtra('discount', $event.target.value)"
-                class="flex-1 border border-gray-200 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400">
-              <button @click="extras.discount = null" x-show="extras.discount" class="text-gray-300 hover:text-red-400 transition-colors">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-              </button>
-            </div>
-          </div>
+          <input type="number" min="0" step="0.01" placeholder="0"
+            :value="extras.vat?.value ?? ''"
+            @focus="ensureExtra('vat')" @input="setExtra('vat', $event.target.value)"
+            class="neon-input flex-1" style="padding:0.5rem 0.875rem">
+          <button @click="extras.vat=null" x-show="extras.vat" class="muted-text hover:pink-text transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+          </button>
         </div>
       </div>
 
-      <!-- Bill totals summary -->
-      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm px-5 py-4 space-y-2">
-        <p class="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">Bill Summary</p>
-        <div class="flex justify-between text-sm text-gray-600">
-          <span>Subtotal</span>
-          <span x-text="`$${subtotal().toFixed(2)}`"></span>
+      <!-- Service Charge -->
+      <div class="neon-card p-5">
+        <div class="flex items-center justify-between mb-3">
+          <span class="font-bold text-white">Service Charge</span>
+          <span class="cyan-text text-sm font-bold" x-show="extras.service_charge"
+            x-text="extras.service_charge ? (extras.service_charge.type==='percent' ? `${extras.service_charge.value}%` : `$${parseFloat(extras.service_charge.value||0).toFixed(2)}`) : ''"></span>
         </div>
-        <div class="flex justify-between text-sm text-gray-600" x-show="vatAmount() > 0">
-          <span>VAT</span>
-          <span x-text="`+$${vatAmount().toFixed(2)}`"></span>
+        <div class="flex items-center gap-3">
+          <div class="flex rounded-xl overflow-hidden text-sm" style="border:1px solid #2D2D4E">
+            <button @click="ensureExtra('service_charge'); extras.service_charge.type='percent'"
+              :style="extras.service_charge?.type==='percent' ? 'background:#7C3AED; color:white' : 'background:#12122A; color:#A0A0C0'"
+              class="px-3 py-2 font-bold transition-colors">%</button>
+            <button @click="ensureExtra('service_charge'); extras.service_charge.type='fixed'"
+              :style="extras.service_charge?.type==='fixed' ? 'background:#7C3AED; color:white' : 'background:#12122A; color:#A0A0C0'"
+              class="px-3 py-2 font-bold border-l transition-colors" style="border-color:#2D2D4E">$</button>
+          </div>
+          <input type="number" min="0" step="0.01" placeholder="0"
+            :value="extras.service_charge?.value ?? ''"
+            @focus="ensureExtra('service_charge')" @input="setExtra('service_charge', $event.target.value)"
+            class="neon-input flex-1" style="padding:0.5rem 0.875rem">
+          <button @click="extras.service_charge=null" x-show="extras.service_charge" class="muted-text transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+          </button>
         </div>
-        <div class="flex justify-between text-sm text-gray-600" x-show="serviceAmount() > 0">
-          <span>Service Charge</span>
-          <span x-text="`+$${serviceAmount().toFixed(2)}`"></span>
+      </div>
+
+      <!-- Discount -->
+      <div class="neon-card p-5">
+        <div class="flex items-center justify-between mb-3">
+          <span class="font-bold text-white">Discount</span>
+          <span class="green-text text-sm font-bold" x-show="extras.discount"
+            x-text="extras.discount ? (extras.discount.type==='percent' ? `−${extras.discount.value}%` : `−$${parseFloat(extras.discount.value||0).toFixed(2)}`) : ''"></span>
         </div>
-        <div class="flex justify-between text-sm text-green-600" x-show="discountAmount() > 0">
-          <span>Discount</span>
-          <span x-text="`−$${discountAmount().toFixed(2)}`"></span>
+        <div class="flex items-center gap-3">
+          <div class="flex rounded-xl overflow-hidden text-sm" style="border:1px solid #2D2D4E">
+            <button @click="ensureExtra('discount'); extras.discount.type='percent'"
+              :style="extras.discount?.type==='percent' ? 'background:#00FF87; color:#0D0D1A' : 'background:#12122A; color:#A0A0C0'"
+              class="px-3 py-2 font-bold transition-colors">%</button>
+            <button @click="ensureExtra('discount'); extras.discount.type='fixed'"
+              :style="extras.discount?.type==='fixed' ? 'background:#00FF87; color:#0D0D1A' : 'background:#12122A; color:#A0A0C0'"
+              class="px-3 py-2 font-bold border-l transition-colors" style="border-color:#2D2D4E">$</button>
+          </div>
+          <input type="number" min="0" step="0.01" placeholder="0"
+            :value="extras.discount?.value ?? ''"
+            @focus="ensureExtra('discount')" @input="setExtra('discount', $event.target.value)"
+            class="neon-input flex-1" style="padding:0.5rem 0.875rem">
+          <button @click="extras.discount=null" x-show="extras.discount" class="muted-text transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+          </button>
         </div>
-        <div class="h-px bg-gray-100 my-1"></div>
-        <div class="flex justify-between font-bold text-gray-900 text-base">
-          <span>Total</span>
-          <span x-text="`$${grandTotal().toFixed(2)}`"></span>
+      </div>
+
+      <!-- Bill totals -->
+      <div class="neon-card p-5 space-y-2">
+        <p class="label-muted mb-3">Bill Summary</p>
+        <div class="flex justify-between text-sm" style="color:#A0A0C0">
+          <span>Subtotal</span><span x-text="`$${subtotal().toFixed(2)}`"></span>
+        </div>
+        <div class="flex justify-between text-sm" style="color:#A0A0C0" x-show="vatAmount()>0">
+          <span>VAT</span><span x-text="`+$${vatAmount().toFixed(2)}`"></span>
+        </div>
+        <div class="flex justify-between text-sm" style="color:#A0A0C0" x-show="serviceAmount()>0">
+          <span>Service Charge</span><span x-text="`+$${serviceAmount().toFixed(2)}`"></span>
+        </div>
+        <div class="flex justify-between text-sm green-text" x-show="discountAmount()>0">
+          <span>Discount</span><span x-text="`−$${discountAmount().toFixed(2)}`"></span>
+        </div>
+        <div class="section-divider"></div>
+        <div class="flex justify-between font-black text-lg">
+          <span class="text-white">Total</span>
+          <span class="amount-display" x-text="`$${grandTotal().toFixed(2)}`"></span>
         </div>
       </div>
 
       <!-- Error -->
-      <div x-show="error" x-text="error" class="text-red-600 text-sm bg-red-50 rounded-xl px-4 py-3"></div>
+      <div x-show="error" x-text="error" class="text-sm rounded-xl px-4 py-3"
+        style="color:#FF006E; background:rgba(255,0,110,0.08)"></div>
 
       <!-- Submit -->
-      <button @click="submit()" :disabled="items.length === 0 || submitting"
-        class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 rounded-2xl transition-colors disabled:opacity-50 text-base shadow-sm">
+      <button @click="submit()" :disabled="items.length===0||submitting" class="neon-btn neon-btn-primary" style="font-size:1rem; padding:1rem">
         <span x-show="!submitting">Submit Bill</span>
         <span x-show="submitting">Saving…</span>
       </button>
 
-      <p class="text-center text-xs text-gray-400 pb-2">
-        <span x-text="unassignedCount()"></span>
-        <span x-show="unassignedCount() > 0"> item(s) have no one assigned — they'll show as unassigned in the summary.</span>
-        <span x-show="unassignedCount() === 0">All items assigned ✓</span>
+      <p class="text-center text-xs pb-2" style="color:#A0A0C0">
+        <span x-show="unassignedCount()>0" class="pink-text" x-text="`${unassignedCount()} item(s) unassigned — will appear separately in summary.`"></span>
+        <span x-show="unassignedCount()===0" class="green-text">All items assigned ✓</span>
       </p>
     </div>
   </div>

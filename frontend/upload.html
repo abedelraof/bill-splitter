@@ -7,77 +7,90 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
   <link rel="stylesheet" href="/css/app.css">
+  <style>
+    @keyframes pulse-border {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(0,245,255,0.3); }
+      50%       { box-shadow: 0 0 0 8px rgba(0,245,255,0); }
+    }
+    .upload-zone { animation: pulse-border 2.5s infinite; }
+    .upload-zone.has-file { animation: none; }
+  </style>
 </head>
-<body class="min-h-screen bg-gray-50" x-data="uploadPage()" x-init="init()">
+<body style="background:#0D0D1A" class="min-h-screen pb-10" x-data="uploadPage()" x-init="init()">
 
   <!-- Nav -->
-  <nav class="bg-white border-b border-gray-100 sticky top-0 z-10">
+  <nav class="neon-nav">
     <div class="max-w-lg mx-auto px-4 h-14 flex items-center gap-3">
-      <a href="/dashboard.html" class="text-gray-400 hover:text-indigo-600 transition-colors">
+      <a href="/dashboard.html" style="color:#A0A0C0" class="hover:text-white transition-colors">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
       </a>
-      <span class="font-bold text-gray-800">Upload Bill</span>
+      <span class="font-bold text-white">Upload Bill</span>
     </div>
   </nav>
 
-  <div class="max-w-lg mx-auto px-4 py-8 space-y-6">
+  <div class="max-w-lg mx-auto px-4 py-8 space-y-5">
 
-    <!-- Upload area -->
-    <div class="bg-white rounded-2xl shadow-sm border-2 border-dashed border-gray-200 p-8 text-center cursor-pointer hover:border-indigo-400 transition-colors"
-      @click="!preview && triggerUpload()" :class="preview ? 'border-solid border-indigo-200' : ''">
+    <!-- Upload zone -->
+    <div class="upload-zone rounded-2xl p-8 text-center cursor-pointer transition-all"
+      :class="preview ? 'has-file' : ''"
+      style="border: 2px dashed #00F5FF; background:#12122A"
+      @click="!preview && triggerUpload()">
 
-      <!-- Hidden file input -->
       <input type="file" id="bill-input" accept="image/*" capture="environment" class="hidden"
         @change="onFileSelected($event)">
 
       <template x-if="!preview">
         <div>
           <div class="text-6xl mb-4">📷</div>
-          <p class="font-semibold text-gray-700 text-lg">Take a photo or upload</p>
-          <p class="text-gray-400 text-sm mt-1">Tap to use your camera or choose an image</p>
-          <p class="text-gray-300 text-xs mt-3">JPG, PNG, WEBP supported</p>
+          <p class="font-bold text-white text-lg">Take a photo or upload</p>
+          <p class="mt-1 text-sm" style="color:#A0A0C0">Tap to use your camera or choose an image</p>
+          <p class="mt-3 text-xs" style="color:#2D2D4E">JPG · PNG · WEBP</p>
         </div>
       </template>
 
       <template x-if="preview">
         <div>
-          <img :src="preview" class="max-h-72 mx-auto rounded-xl object-contain mb-4">
-          <button @click.stop="triggerUpload()" class="text-sm text-indigo-600 hover:text-indigo-800 underline">
-            Change photo
-          </button>
+          <img :src="preview" class="max-h-64 mx-auto rounded-xl object-contain mb-4"
+            style="border:1px solid #2D2D4E">
+          <button @click.stop="triggerUpload()" class="text-sm cyan-text hover:underline">Change photo</button>
         </div>
       </template>
     </div>
 
-    <!-- Error message -->
-    <div x-show="error" x-text="error" class="text-red-600 text-sm bg-red-50 rounded-xl px-4 py-3"></div>
-
     <!-- No API key warning -->
-    <div x-show="noKey" class="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 text-sm text-amber-700">
-      You haven't set your Claude API key yet.
-      <a href="/settings.html" class="font-semibold underline">Go to Settings</a> to add it.
+    <div x-show="noKey" class="neon-card-sm px-4 py-3 flex items-center gap-3"
+      style="border-color:rgba(255,0,110,0.4); background:rgba(255,0,110,0.06)">
+      <span class="status-dot-pink flex-shrink-0"></span>
+      <p class="text-sm" style="color:#FF006E">
+        No Claude API key set.
+        <a href="/settings.html" class="font-bold underline">Go to Settings</a> to add one.
+      </p>
     </div>
+
+    <!-- Error -->
+    <div x-show="error" x-text="error" class="text-sm rounded-xl px-4 py-3"
+      style="color:#FF006E; background:rgba(255,0,110,0.08); border:1px solid rgba(255,0,110,0.2)"></div>
 
     <!-- Actions -->
-    <div class="space-y-3">
-      <button @click="parseBill()" :disabled="!selectedFile || loading || noKey"
-        class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3.5 rounded-xl transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
-        <template x-if="loading">
-          <svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/></svg>
-        </template>
-        <span x-text="loading ? 'Analyzing with AI…' : 'Parse Bill with AI'"></span>
-      </button>
+    <button @click="parseBill()" :disabled="!selectedFile || loading || noKey" class="neon-btn neon-btn-primary">
+      <template x-if="loading">
+        <svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/>
+        </svg>
+      </template>
+      <span x-text="loading ? 'Analyzing with AI…' : 'Parse Bill with AI'"></span>
+    </button>
 
-      <button @click="skipToManual()"
-        class="w-full border border-gray-200 text-gray-600 hover:bg-gray-50 font-medium py-3 rounded-xl transition-colors text-sm">
-        Enter items manually
-      </button>
+    <button @click="skipToManual()" class="neon-btn neon-btn-ghost text-sm">
+      Enter items manually
+    </button>
+
+    <!-- Loading hint -->
+    <div x-show="loading" class="text-center text-sm py-2" style="color:#A0A0C0">
+      Claude is reading your bill — usually 5–10 seconds ✨
     </div>
 
-    <!-- Loading overlay info -->
-    <div x-show="loading" class="bg-indigo-50 rounded-xl px-4 py-3 text-sm text-indigo-700 text-center">
-      Claude is reading your bill… this usually takes 5–10 seconds.
-    </div>
   </div>
 
   <div id="toast" class="toast"></div>

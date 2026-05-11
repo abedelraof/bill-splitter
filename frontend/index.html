@@ -8,63 +8,53 @@
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
   <link rel="stylesheet" href="/css/app.css">
 </head>
-<body class="min-h-screen bg-gradient-to-br from-indigo-50 to-purple-50 flex items-center justify-center p-4">
-  <div class="w-full max-w-md" x-data="authPage()">
-    <div class="text-center mb-8">
-      <div class="text-5xl mb-3">🧾</div>
-      <h1 class="text-3xl font-bold text-indigo-700">Bill Splitter</h1>
-      <p class="text-gray-500 mt-1">Split bills fairly with AI</p>
+<body style="background:#0D0D1A" class="min-h-screen flex items-center justify-center p-5" x-data="authPage()">
+
+  <div class="w-full max-w-sm">
+
+    <!-- Logo -->
+    <div class="text-center mb-10">
+      <div class="text-6xl mb-4">🧾</div>
+      <h1 class="text-3xl font-black text-white tracking-tight">Bill Splitter</h1>
+      <p class="mt-1" style="color:#A0A0C0">Split smarter with AI</p>
     </div>
 
-    <!-- Tab switcher -->
-    <div class="flex bg-white rounded-2xl shadow-sm border border-gray-100 p-1 mb-6">
-      <button @click="tab='login'" :class="tab==='login' ? 'bg-indigo-600 text-white shadow' : 'text-gray-500 hover:text-gray-700'"
-        class="flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all">Sign In</button>
-      <button @click="tab='signup'" :class="tab==='signup' ? 'bg-indigo-600 text-white shadow' : 'text-gray-500 hover:text-gray-700'"
-        class="flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all">Sign Up</button>
+    <!-- Tab bar -->
+    <div class="neon-tab-bar mb-5">
+      <button class="neon-tab" :class="tab==='login' && 'active'" @click="tab='login'">Sign In</button>
+      <button class="neon-tab" :class="tab==='signup' && 'active'" @click="tab='signup'">Sign Up</button>
     </div>
 
-    <!-- Login form -->
-    <div x-show="tab==='login'" class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-4">
+    <!-- Form card -->
+    <div class="neon-card p-6 space-y-4">
+
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-        <input x-model="email" type="email" placeholder="you@example.com" autocomplete="email"
-          class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400">
+        <label class="label-muted block mb-1.5">Email</label>
+        <input x-model="email" type="email" placeholder="you@example.com" autocomplete="email" class="neon-input">
       </div>
+
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
-        <input x-model="password" type="password" placeholder="••••••••" autocomplete="current-password"
-          class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
-          @keydown.enter="login()">
+        <label class="label-muted block mb-1.5">Password</label>
+        <input x-model="password" type="password" placeholder="••••••••"
+          :autocomplete="tab==='login' ? 'current-password' : 'new-password'"
+          class="neon-input" @keydown.enter="tab==='login' ? login() : signup()">
       </div>
-      <div x-show="error" x-text="error" class="text-red-600 text-sm bg-red-50 rounded-xl px-4 py-2"></div>
-      <button @click="login()" :disabled="loading"
-        class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 rounded-xl transition-colors disabled:opacity-60">
-        <span x-show="!loading">Sign In</span>
-        <span x-show="loading">Signing in…</span>
+
+      <!-- Error -->
+      <div x-show="error" x-text="error"
+        class="text-sm rounded-xl px-4 py-2.5" style="color:#FF006E; background:rgba(255,0,110,0.08); border:1px solid rgba(255,0,110,0.2)"></div>
+
+      <!-- Submit -->
+      <button @click="tab==='login' ? login() : signup()" :disabled="loading" class="neon-btn neon-btn-primary mt-1">
+        <span x-show="!loading" x-text="tab==='login' ? 'Sign In' : 'Create Account'"></span>
+        <span x-show="loading">Please wait…</span>
       </button>
+
     </div>
 
-    <!-- Signup form -->
-    <div x-show="tab==='signup'" class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-4">
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-        <input x-model="email" type="email" placeholder="you@example.com" autocomplete="email"
-          class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400">
-      </div>
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
-        <input x-model="password" type="password" placeholder="••••••••" autocomplete="new-password"
-          class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
-          @keydown.enter="signup()">
-      </div>
-      <div x-show="error" x-text="error" class="text-red-600 text-sm bg-red-50 rounded-xl px-4 py-2"></div>
-      <button @click="signup()" :disabled="loading"
-        class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 rounded-xl transition-colors disabled:opacity-60">
-        <span x-show="!loading">Create Account</span>
-        <span x-show="loading">Creating account…</span>
-      </button>
-    </div>
+    <p class="text-center mt-5 text-xs" style="color:#A0A0C0">
+      Your Claude API key stays private — stored securely on the server.
+    </p>
   </div>
 
   <script src="/js/api.js"></script>
