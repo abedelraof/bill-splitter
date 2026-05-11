@@ -1,0 +1,41 @@
+/* Toast notifications */
+.toast {
+  position: fixed;
+  bottom: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%) translateY(4rem);
+  background: #1f2937;
+  color: #fff;
+  padding: 0.6rem 1.2rem;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  z-index: 9999;
+  opacity: 0;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  pointer-events: none;
+  white-space: nowrap;
+  max-width: 90vw;
+  text-align: center;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.toast.toast-error {
+  background: #dc2626;
+}
+
+.toast.toast-success {
+  background: #059669;
+}
+
+/* Smooth page transitions */
+body {
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Fix Alpine.js flash of unstyled content */
+[x-cloak] { display: none !important; }

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Upload Bill – Bill Splitter</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <link rel="stylesheet" href="/css/app.css">
+</head>
+<body class="min-h-screen bg-gray-50" x-data="uploadPage()" x-init="init()">
+
+  <!-- Nav -->
+  <nav class="bg-white border-b border-gray-100 sticky top-0 z-10">
+    <div class="max-w-lg mx-auto px-4 h-14 flex items-center gap-3">
+      <a href="/dashboard.html" class="text-gray-400 hover:text-indigo-600 transition-colors">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+      </a>
+      <span class="font-bold text-gray-800">Upload Bill</span>
+    </div>
+  </nav>
+
+  <div class="max-w-lg mx-auto px-4 py-8 space-y-6">
+
+    <!-- Upload area -->
+    <div class="bg-white rounded-2xl shadow-sm border-2 border-dashed border-gray-200 p-8 text-center cursor-pointer hover:border-indigo-400 transition-colors"
+      @click="!preview && triggerUpload()" :class="preview ? 'border-solid border-indigo-200' : ''">
+
+      <!-- Hidden file input -->
+      <input type="file" id="bill-input" accept="image/*" capture="environment" class="hidden"
+        @change="onFileSelected($event)">
+
+      <template x-if="!preview">
+        <div>
+          <div class="text-6xl mb-4">📷</div>
+          <p class="font-semibold text-gray-700 text-lg">Take a photo or upload</p>
+          <p class="text-gray-400 text-sm mt-1">Tap to use your camera or choose an image</p>
+          <p class="text-gray-300 text-xs mt-3">JPG, PNG, WEBP supported</p>
+        </div>
+      </template>
+
+      <template x-if="preview">
+        <div>
+          <img :src="preview" class="max-h-72 mx-auto rounded-xl object-contain mb-4">
+          <button @click.stop="triggerUpload()" class="text-sm text-indigo-600 hover:text-indigo-800 underline">
+            Change photo
+          </button>
+        </div>
+      </template>
+    </div>
+
+    <!-- Error message -->
+    <div x-show="error" x-text="error" class="text-red-600 text-sm bg-red-50 rounded-xl px-4 py-3"></div>
+
+    <!-- No API key warning -->
+    <div x-show="noKey" class="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 text-sm text-amber-700">
+      You haven't set your Claude API key yet.
+      <a href="/settings.html" class="font-semibold underline">Go to Settings</a> to add it.
+    </div>
+
+    <!-- Actions -->
+    <div class="space-y-3">
+      <button @click="parseBill()" :disabled="!selectedFile || loading || noKey"
+        class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3.5 rounded-xl transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
+        <template x-if="loading">
+          <svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/></svg>
+        </template>
+        <span x-text="loading ? 'Analyzing with AI…' : 'Parse Bill with AI'"></span>
+      </button>
+
+      <button @click="skipToManual()"
+        class="w-full border border-gray-200 text-gray-600 hover:bg-gray-50 font-medium py-3 rounded-xl transition-colors text-sm">
+        Enter items manually
+      </button>
+    </div>
+
+    <!-- Loading overlay info -->
+    <div x-show="loading" class="bg-indigo-50 rounded-xl px-4 py-3 text-sm text-indigo-700 text-center">
+      Claude is reading your bill… this usually takes 5–10 seconds.
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+  <script src="/js/api.js"></script>
+  <script src="/js/upload.js"></script>
+</body>
+</html>
